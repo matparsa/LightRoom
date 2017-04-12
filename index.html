@@ -125,7 +125,7 @@
             if (Imgs.length < (imageIndex + numberOfItems))
                 numberOfItems = Imgs.length - imageIndex;
             for (var i = imageIndex; i < (imageIndex + numberOfItems) ; i++) {
-                element = '<a href="1_b23918b11a_b.jpg" title="Maybe spring"><img alt="' + Imgs[i].TagIDs.join(' ') + '" src="Content/OriginalFiles/images/thumb/' + Imgs[i].ImageName + '" /> </a>';
+                element = '<a href="1_b23918b11a_b.jpg" title="Maybe spring"><img alt="' + Imgs[i].TagIDs.join(' ') + '" src="https://raw.githubusercontent.com/matparsa/LightRoom/master/Content/OriginalFiles/images/thumb/' + Imgs[i].ImageName + '" /> </a>';
                 $gallery.append(element);
             }
             numberOfItems = 10;
