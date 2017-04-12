@@ -37,7 +37,7 @@
         var container = [];
         $(document).ready(function () {
 
-            $.getJSON("Content/ImagesInformation.Json", function (jsonData) {
+            $.getJSON("Content/ImagesInformation.json", function (jsonData) {
                 $.each(jsonData.Tags, function (i, v) {
                     $("#tagList").append("<li data-f='" + v.ID + "' class='filter-item'><div><span>" + v.Caption + "</span></div></li>");
                 });
