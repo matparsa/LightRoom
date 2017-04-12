@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="CSS/colorbox.css" rel="stylesheet" />
+    <link href="CSS/LightRoom.css" rel="stylesheet" />
+    <link href="CSS/swipebox.min.css" rel="stylesheet" />
+</head>
+
+<body>
+    <h1>Infinite scroll test</h1>
+    <div class="frame" id="basic" style="overflow: hidden;">
+        <ul class="clearfix" id="tagList" style="transform: translateZ(0px) translateX(-684px); width: 6840px;">
+            <li data-f="*" class="filter-item active"><div><span>All</span></div></li>
+        </ul>
+    </div>
+    <div id="gallery">
+    </div>
+
+    <!-- bower:js -->
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/jquery.colorbox-min.js"></script>
+    <script src="scripts/jquery.swipebox.min.js"></script>
+    <script src="scripts/jquery.justifiedGallery.min.js"></script>
+    <script src='scripts/modernizr.js'></script>
+    <script src='scripts/plugins.js'></script>
+    <script src="scripts/Sly.Min.js"></script>
+    <!-- endbower -->
+    <script>
+        var filters = [];
+        var newFilter = false;
+        defaultNumberOfItems = 40;
+        numberOfItems = defaultNumberOfItems;
+        imageIndex = 0;
+        Imgs = [];
+        var tags = [];
+        var container = [];
+        $(document).ready(function () {
+
+            $.getJSON("Content/ImagesInformation.Json", function (jsonData) {
+                $.each(jsonData.Tags, function (i, v) {
+                    $("#tagList").append("<li data-f='" + v.ID + "' class='filter-item'><div><span>" + v.Caption + "</span></div></li>");
+                });
+                container = jsonData.Images;
+                scrollTags();
+                run();
+
+            });
+        });
+
+        function scrollTags() {
+            var $frame = $('#basic');
+            var $slidee = $frame.children('ul').eq(0);
+            var $wrap = $frame.parent();
+
+            // Call Sly on frame
+            $frame.sly({
+                horizontal: 1,
+                itemNav: 'centered',
+                smart: 1,
+                activateOn: 'click',
+                mouseDragging: 1,
+                touchDragging: 1,
+                releaseSwing: 1,
+                scrollBy: 1,
+                activatePageOn: 'click',
+                speed: 300,
+                elasticBounds: 1,
+                easing: 'easeOutExpo',
+                dragHandle: 1,
+                dynamicHandle: 1,
+                clickBar: 1
+            });
+        }
+
+
+        function run() {
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+                    GenerateItems();
+                    console.log("generated.");
+                }
+            });
+            GenerateItems();
+            $gallery.justifiedGallery({
+                rowHeight: 120
+            });
+
+            $(document).on('click', '.filter-item', function () {
+
+                //Filters is an array because we might use multiple choice in future
+                filters = [];
+                numberOfItems = defaultNumberOfItems;
+                imageIndex = 0;
+                filters.push($(this).data('f'));
+                $gallery.html('');
+                newFilter = true;
+                GenerateItems();
+                newFilter = false;
+
+            });
+        }
+        function GenerateItems() {
+            if (filters.length) {
+                if (newFilter) {
+                    if (filters.indexOf("*") != -1)
+                        Imgs = container;
+                    else {
+                        Imgs = container.filter(function (i, n) {
+                            var contain = false;
+                            $(i.TagIDs).each(function (index) {
+                                if (filters.indexOf(i.TagIDs[index]) != -1) {
+                                    contain = true;
+                                }
+                            });
+                            return contain;
+                        });
+                    }
+                }
+            }
+            else {
+                Imgs = container;
+            }
+            //if number of images is less than number of next loop iteration
+            if (Imgs.length < (imageIndex + numberOfItems))
+                numberOfItems = Imgs.length - imageIndex;
+            for (var i = imageIndex; i < (imageIndex + numberOfItems) ; i++) {
+                element = '<a href="1_b23918b11a_b.jpg" title="Maybe spring"><img alt="' + Imgs[i].TagIDs.join(' ') + '" src="Content/OriginalFiles/images/thumb/' + Imgs[i].ImageName + '" /> </a>';
+                $gallery.append(element);
+            }
+            numberOfItems = 10;
+            imageIndex = i;
+            $gallery.justifiedGallery((newFilter == false ? "norewind" : ""));
+        }
+        var $gallery = $("#gallery");
+        $gallery.justifiedGallery();
+    </script>
+</body>
+
+</html>
