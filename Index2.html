@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>BExIS - LightRoom</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="Content/Scripts/LightRoom.css" rel="stylesheet" />
+    <link href="Content/Scripts/nanoGALLERY-5.10.3/css/nanogallery.css" rel="stylesheet" />
+   
+</head>
+
+<body style="background-color:black">
+    <h1>Lazy Gallery</h1>
+    <div class="frame" id="basic" style="overflow: hidden;width:90%;margin:0 auto;">
+        <ul class="clearfix" id="tagList" style="transform: translateZ(0px) translateX(-684px); width: 6840px;">
+            <li data-f="*" class="filter-item active"><div><span>All</span></div></li>
+        </ul>
+    </div>
+    <div id="nanoGallery">
+    </div>
+	 <script src="Content/Scripts/nanoGALLERY-5.10.3/third.party/jquery-1.7.1.min.js"></script>
+    <script src="Content/Scripts/nanoGALLERY-5.10.3/dist/jquery.nanogallery.min.js"></script>
+    <script src='Content/Scripts/modernizr.js'></script>
+    <script src='Content/Scripts/plugins.js'></script>
+    <script src="Content/Scripts/Sly.Min.js"></script>
+    <script>
+        var container = [];
+        var tags = [];
+        $.getJSON("Content/ImagesInformation.Json", function (jsonData) {
+            $.each(jsonData, function (i, v) {
+                $.each(v.title.split(','), function (indextag, tag) {
+                    if(tags.indexOf(tag)==-1)
+                    {
+                        tags.push(tag);
+                        $("#tagList").append("<li class='filter-item'><div><span>" + tag + "</span></div></li>");
+                    }
+                });
+            });
+            container = jsonData;
+            run();
+        });
+        myColorSchemeViewer = {
+            background: 'rgba(1, 1, 1, 0.75)',
+            imageBorder: '12px solid #f8f8f8',
+            imageBoxShadow: '#888 0px 0px 20px',
+            barBackground: '#222',
+            barBorder: '2px solid #111',
+            barColor: '#eee',
+            barDescriptionColor: '#aaa'
+        };
+        var $gallery=jQuery("#nanoGallery");
+        function makeGallery(items)
+        {
+           
+            $gallery.nanoGallery({
+                items: items,
+                itemsBaseURL: 'Content/images/',
+                viewerDisplayLogo: false,
+                thumbnailLazyLoad: true, 
+                thumbnailHoverEffect: [{ name: 'imageScale150', duration: 300 }],
+
+                thumbnailGutterWidth: 0,
+                thumbnailGutterHeight: 0,
+                thumbnailLabel: { display: true, position: 'overImageOnBottom', titleMaxLength: 20, align: 'center' }
+            });
+        }
+        function run() {
+            makeGallery(container);
+            scrollTags();
+            $(document).on('click', '.filter-item', function () {
+                filter = $(this).text();
+                items = [];
+                $gallery.nanoGallery('destroy');
+                if (filter.indexOf("*") != -1)
+                    items = container;
+                else {
+                    items = container.filter(function (i, n) {
+                       
+                        return i.title.indexOf(filter)!=-1;
+                    });
+                }
+              
+                makeGallery(items);
+
+            });
+        };
+
+        function scrollTags() {
+            var $frame = $('#basic');
+            var $slidee = $frame.children('ul').eq(0);
+            var $wrap = $frame.parent();
+
+
+
+            // Call Sly on frame
+            frame = new Sly('#basic', {
+                horizontal: 1,
+                itemNav: 'centered',
+                smart: 1,
+                activateOn: 'click',
+
+                startAt: 0,
+
+                scrollBy: 1,
+                speed: 300,
+                elasticBounds: 1,
+                easing: 'easeOutExpo',
+                dragHandle: 1,
+                dynamicHandle: 1,
+                clickBar: 1,
+
+                // Cycling
+                //cycleBy: 'items',
+                //cycleInterval: 10,
+                //pauseOnHover: 1
+                //horizontal: 1,
+                //itemNav: 'centered',
+                //smart: 1,
+                //activateOn: 'click',
+                //mouseDragging: 1,
+                //touchDragging: 1,
+                //releaseSwing: 1,
+                //scrollBy: 1,
+                //activatePageOn: 'click',
+                //speed: 300,
+                //elasticBounds: 1,
+                //easing: 'easeOutExpo',
+                //dragHandle: 1,
+                //dynamicHandle: 1,
+                //clickBar: 1,
+                //// Cycling
+                //cycleBy: 'items',
+                //cycleInterval: 1000,
+                //pauseOnHover: 1
+            });
+            frame.init();
+            lastItem = $(".filter-item").last();
+            //frame.on('cycle', function (eventName, ij) {
+            //    if (lastItem.attr('class').indexOf("active") != -1)
+            //        frame.pause();
+            //});
+        }
+    </script>
+</body>
+</html>
